@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Jul 22 16:47:05 2018
+
+@author: Horizon
+"""
+
 import numpy as np
 
 #激活函数及其导数
@@ -33,7 +40,6 @@ class BPNeuralNetwork:
               #权值及阈值(w,b)随机初始化
               for i in range(len(layers)-1):
                      self.weights.append(np.random.random((layers[i]+1,layers[i+1])))
-              self.weights_after=self.weights
               print("随机初始化的权值矩阵:",self.weights)
               
        def Forward(self,X,y):#单样本前向传播
@@ -63,22 +69,20 @@ class BPNeuralNetwork:
               #隐层残差
               delt=[]
               for p in range(len(a)-1):
-                     delt.append(np.dot(delt_out,self.weights_after[1][p])*self.activ_deri(a[p]))
+                     delt.append(np.dot(delt_out,self.weights[1][p])*self.activ_deri(a[p]))
                      
               #更新权值
               for i in range(len(a)):
                      for j in range(len(self.y_pred)):
-                            self.weights_after[1][i][j]=self.weights_after[1][i][j]-step*delt_out[j]*a[i]
+                            self.weights[1][i][j]=self.weights[1][i][j]-step*delt_out[j]*a[i]
               
               for i in range(len(X)):
                      for j in range(len(a)-1):
-                            self.weights_after[0][i][j]= self.weights_after[0][i][j]-step*delt[j]*X[i]
+                            self.weights[0][i][j]= self.weights[0][i][j]-step*delt[j]*X[i]
 
-       def weightsUpdata(self):
-              self.weights=self.weights_after
               
        def BPalgorithm(self,X,y,step=0.3,times=50):
-              #X，y为样本,批量学习
+              #X，y为样本
               self.d=0
               for n in range(times):
                      self.error=0
@@ -90,7 +94,6 @@ class BPNeuralNetwork:
                             a=self.Forward(X_s,y_s)
                             self.DeltUpdata(X_s,y_s,a,step)
                      
-                     self.weightsUpdata()
                      print("目前误差:",self.error)
               print("训练集正确率：",self.d/(times*len(X)))
               print("均方误差：",self.error/(times*len(X)))
